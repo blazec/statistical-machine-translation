@@ -31,7 +31,6 @@ global CSC401_A2_DEFNS
 LM=struct();
 LM.uni = struct();
 LM.bi = struct();
-
 SENTSTARTMARK = 'SENTSTART'; 
 SENTENDMARK = 'SENTEND';
 
@@ -40,16 +39,28 @@ DD = dir( [ dataDir, filesep, '*', language] );
 disp([ dataDir, filesep, '.*', language] );
 
 for iFile=1:length(DD)
-
+  disp(DD(iFile).name);
   lines = textread([dataDir, filesep, DD(iFile).name], '%s','delimiter','\n');
-
+  
   for l=1:length(lines)
-
     processedLine =  preprocess(lines{l}, language);
-    words = strsplit(' ', processedLine );
-    
+    disp(processedLine);
+    words = strsplit(processedLine, ' ');
+    disp(words);
     % TODO: THE STUDENT IMPLEMENTS THE FOLLOWING
-
+    for i = 1:length(words)
+        word = words(i);
+        disp(word)
+        if isfield(LM.uni, word)
+            disp('hi1');
+            disp(word);
+            LM.uni.(word) = LM.uni.(word) + 1; 
+        else
+            disp('hi2');
+            disp(word);
+            LM.uni.(word) = 1;
+        end
+    end
     % TODO: THE STUDENT IMPLEMENTED THE PRECEDING
   end
 end
