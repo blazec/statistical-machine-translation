@@ -36,31 +36,46 @@ SENTENDMARK = 'SENTEND';
 
 DD = dir( [ dataDir, filesep, '*', language] );
 
-disp([ dataDir, filesep, '.*', language] );
-
 for iFile=1:length(DD)
-  disp(DD(iFile).name);
+  disp(strcat('Training file ', num2str(iFile))); 
   lines = textread([dataDir, filesep, DD(iFile).name], '%s','delimiter','\n');
   
   for l=1:length(lines)
     processedLine =  preprocess(lines{l}, language);
-    disp(processedLine);
     words = strsplit(processedLine, ' ');
-    disp(words);
     % TODO: THE STUDENT IMPLEMENTS THE FOLLOWING
-    for i = 1:length(words)
-        word = words(i);
-        disp(word)
-        if isfield(LM.uni, word)
-            disp('hi1');
-            disp(word);
-            LM.uni.(word) = LM.uni.(word) + 1; 
+    for i = 1:length(words) - 1
+        word1 = words{i};
+        word2 = words{i+1};
+        
+        % Add unigram count
+        if isfield(LM.uni, word1)
+            LM.uni.(word1) = LM.uni.(word1) + 1;
         else
-            disp('hi2');
-            disp(word);
-            LM.uni.(word) = 1;
+            LM.uni.(word1) = 1;
         end
+        
+        % Add bigram count
+        if isfield(LM.bi, word1)
+            if isfield(LM.bi.(word1), 'word2')
+                LM.bi.(word1).(word2) = LM.bi.(word1).(word2) + 1; 
+            else
+                LM.bi.(word1).(word2) = 1;
+            end
+        else
+            LM.bi.(word1) = struct();
+            LM.bi.(word1).(word2) = 1;
+        end
+        
     end
+   
+    % get the last unigram
+    if isfield(LM.uni, word2)
+        LM.uni.(word2) = LM.uni.(word2) + 1;
+    else
+        LM.uni.(word2) = 1;
+    end
+    
     % TODO: THE STUDENT IMPLEMENTED THE PRECEDING
   end
 end
