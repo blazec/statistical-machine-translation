@@ -7,8 +7,11 @@ function outSentence = separatePunctuations(inSentence)
   outSentence = inSentence;
   
   outSentence = regexprep(outSentence, '\.', ' . ');
+  outSentence = regexprep(outSentence, '\,', ' , ');
   outSentence = regexprep(outSentence, '\?', ' ? ');
   outSentence = regexprep(outSentence, '\!', ' ! ');
+  outSentence = regexprep(outSentence, '`', ' ` ');
+  outSentence = regexprep(outSentence, '''', ' '' ');
   outSentence = regexprep(outSentence, '\"', ' " ');
   outSentence = regexprep(outSentence, '\:', ' : ');
   outSentence = regexprep(outSentence, '\;', ' ; ');
@@ -23,4 +26,11 @@ function outSentence = separatePunctuations(inSentence)
   % trim whitespaces
   outSentence = regexprep(outSentence, '\s+', ' ');
 
+%   switch language
+%       case 'e'
+%           
+%       
+%       case 'f'
+%   end
+  
 end

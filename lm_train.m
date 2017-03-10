@@ -42,7 +42,7 @@ for iFile=1:length(DD)
   
   for l=1:length(lines)
     processedLine =  preprocess(lines{l}, language);
-    words = strsplit(processedLine, ' ');
+    words = strsplit(' ', processedLine);
     % TODO: THE STUDENT IMPLEMENTS THE FOLLOWING
     for i = 1:length(words) - 1
         word1 = words{i};
@@ -80,4 +80,5 @@ for iFile=1:length(DD)
   end
 end
 
-save( fn_LM, 'LM', '-mat'); 
+% save( fn_LM, 'LM', '-mat'); 
+save(fn_LM, '-struct', 'LM');
