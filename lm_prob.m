@@ -69,13 +69,13 @@ function logProb = lm_prob(sentence, LM, type, delta, vocabSize)
                 end 
             % no bigram exists for combination    
             else
-                logProb = -Inf;
+                logProb = log2(0);
                 break
             end
           
           % unigram doesn't exist
           else
-            logProb = -Inf;
+            logProb = log2(0);
             break
           end
       end 
