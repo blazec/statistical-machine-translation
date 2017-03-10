@@ -45,44 +45,67 @@ function logProb = lm_prob(sentence, LM, type, delta, vocabSize)
   end
 
   words = strsplit(' ', sentence);
-  disp(words);
   % TODO: the student implements the following
   
   % Type not specified
   if isempty(type)
       logProb = 0;
       for i = 1:length(words) - 1 
-          word1 = lower(words{i});
-          word2 = lower(words{i+1});
+          word1 = words{i};
+          word2 = words{i+1};
           
-          % Get P(wt+1 | wt
+          % Get P(wt+1 | wt)
           
           % check if unigram (word1) exists
           if isfield(LM.uni, word1)
             word1count = LM.uni.(word1);
-            
-            % check if bigram exists
-            if isfield(LM.bi, word1)
-                if isfield(LM.bi.(word1), word2)
-                    word1word2bigramcount = LM.bi.(word1).(word2);
-                    logProb = logProb + log2(word1word2bigramcount / word1count);
-                end 
-            % no bigram exists for combination    
-            else
-                logProb = log2(0);
-                break
-            end
+                % check if bigram exists
+                if isfield(LM.bi, word1)
+                    if isfield(LM.bi.(word1), word2)
+                        word1word2bigramcount = LM.bi.(word1).(word2);
+                        logProb = logProb + log2(word1word2bigramcount / word1count);
+                    end 
+                % no bigram exists for combination    
+                else
+                    logProb = log2(0);
+                    break
+                end
           
           % unigram doesn't exist
           else
             logProb = log2(0);
             break
           end
-      end 
+      end
       
   % Delta smoothing
-  else
-      
+  elseif strcmp(type, 'smooth') 
+      logProb = 0;
+      for i = 1:length(words) - 1
+        word1 = words{i};
+        word2 = words{i+1};
+        
+        % Get P(wt+1 | wt)
+        
+        % check if word1 exists
+        if isfield(LM.uni, word1)
+            word1count = LM.uni.(word1);
+            if isfield(LM.bi, word1)
+                if isfield(LM.bi.(word1), word2)
+                    word1word2bigramcount = LM.bi.(word1).(word2);
+                else
+                    word1word2bigramcount = 0;
+                end
+            else
+                word1word2bigramcount = 0;
+            end
+        else
+            word1count = 0;
+        end
+        
+        logProb = logProb + log2((word1word2bigramcount + delta) / (word1count + (delta * vocabSize)));
+        
+      end
   end
 
   
