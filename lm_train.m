@@ -42,7 +42,6 @@ for iFile=1:length(DD)
   
   for l=1:length(lines)
     processedLine =  preprocess(lines{l}, language);
-    disp(processedLine);
     words = strsplit(' ', processedLine);
     % TODO: THE STUDENT IMPLEMENTS THE FOLLOWING
     if length(words) > 1
@@ -81,7 +80,6 @@ for iFile=1:length(DD)
     else
         if length(words) == 1
             word1 = words{1};
-            disp(words);
             % Add unigram count
             if isfield(LM.uni, word1)
                 LM.uni.(word1) = LM.uni.(word1) + 1;
