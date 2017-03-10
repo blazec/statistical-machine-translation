@@ -42,40 +42,54 @@ for iFile=1:length(DD)
   
   for l=1:length(lines)
     processedLine =  preprocess(lines{l}, language);
+    disp(processedLine);
     words = strsplit(' ', processedLine);
     % TODO: THE STUDENT IMPLEMENTS THE FOLLOWING
-    for i = 1:length(words) - 1
-        word1 = words{i};
-        word2 = words{i+1};
-        
-        % Add unigram count
-        if isfield(LM.uni, word1)
-            LM.uni.(word1) = LM.uni.(word1) + 1;
-        else
-            LM.uni.(word1) = 1;
-        end
-        
-        % Add bigram count
-        if isfield(LM.bi, word1)
-            if isfield(LM.bi.(word1), 'word2')
-                LM.bi.(word1).(word2) = LM.bi.(word1).(word2) + 1; 
+    if length(words) > 1
+
+        for i = 1:length(words) - 1
+            word1 = words{i};
+            word2 = words{i+1};
+
+            % Add unigram count
+            if isfield(LM.uni, word1)
+                LM.uni.(word1) = LM.uni.(word1) + 1;
             else
+                LM.uni.(word1) = 1;
+            end
+
+            % Add bigram count
+            if isfield(LM.bi, word1)
+                if isfield(LM.bi.(word1), word2)
+                    LM.bi.(word1).(word2) = LM.bi.(word1).(word2) + 1; 
+                else
+                    LM.bi.(word1).(word2) = 1;
+                end
+            else
+                LM.bi.(word1) = struct();
                 LM.bi.(word1).(word2) = 1;
             end
-        else
-            LM.bi.(word1) = struct();
-            LM.bi.(word1).(word2) = 1;
+
         end
-        
-    end
-   
-    % get the last unigram
-    if isfield(LM.uni, word2)
-        LM.uni.(word2) = LM.uni.(word2) + 1;
+         % get the last unigram
+        if isfield(LM.uni, word2)
+            LM.uni.(word2) = LM.uni.(word2) + 1;
+        else
+            LM.uni.(word2) = 1;
+        end
+    % length words <= 1    
     else
-        LM.uni.(word2) = 1;
+        if length(words) == 1
+            word1 = words{1};
+            disp(words);
+            % Add unigram count
+            if isfield(LM.uni, word1)
+                LM.uni.(word1) = LM.uni.(word1) + 1;
+            else
+                LM.uni.(word1) = 1;
+            end            
+        end    
     end
-    
     % TODO: THE STUDENT IMPLEMENTED THE PRECEDING
   end
 end
