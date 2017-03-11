@@ -124,7 +124,7 @@ function AM = initialize(eng, fr, numSentences)
                end
                for iWordFr=1:numel(sentFr)
                   wordFr = sentFr(iWordFr);
-                  wordFr = wordFr{1}
+                  wordFr = wordFr{1};
                   if ~strcmp(wordFr, 'SENTSTART') && ~strcmp(wordFr, 'SENTEND')
                       AM.(word).(wordFr) = 0;
                   end
