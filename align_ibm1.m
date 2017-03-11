@@ -107,7 +107,7 @@ function [eng, fr] = read_hansard(mydir, numSentences)
 end
 
 
-function AM = initialize(eng, fr)
+function AM = initialize(eng, fr, numSentences)
 %
 % Initialize alignment model uniformly.
 % Only set non-zero probabilities where word pairs appear in corresponding sentences.
@@ -149,7 +149,7 @@ function AM = initialize(eng, fr)
     AM.SENTSTART.SENTSTART = 1;
     AM.SENTEND.SENTEND = 1;
     
-    save('AM_struct.mat', 'AM');
+    save(strcat('AM_struct-', num2str(numSentences), '.mat'), 'AM');
 
 end
 
