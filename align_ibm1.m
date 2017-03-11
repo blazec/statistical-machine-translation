@@ -39,13 +39,13 @@ function AM = align_ibm1(trainDir, numSentences, maxIter, fn_AM)
   % Initialize AM uniformly 
   AM = initialize(eng, fr, numSentences);
 % 
-%   % Iterate between E and M steps
-%   for iter=1:maxIter,
-%     AM = em_step(AM, eng, fre);
-%   end
-% 
-%   % Save the alignment model
-%   save( fn_AM, 'AM', '-mat'); 
+  % Iterate between E and M steps
+  for iter=1:maxIter,
+    AM = em_step(AM, eng, fre);
+  end
+
+  % Save the alignment model
+  save( fn_AM, 'AM', '-mat'); 
 
   end
 
@@ -152,11 +152,61 @@ function AM = initialize(eng, fr, numSentences)
 
 end
 
-function t = em_step(t, eng, fre)
+function t = em_step(t, eng, fr)
 % 
 % One step in the EM algorithm.
 %
-  
+    FECount = struct();
+    ECount = struct();
+    
+    for iEngSent = 1:numel(eng)
+        currEngSent = eng{iSent};
+        currFrSent = fr{iSent};
+        uniqueEng = unique(currEngSent);
+        uniqueFr = unique(currFrSent);
+        
+        for iUniqueFr=1:numel(uniqueFr)
+            currUniqueFr = uniqueFr{iUniqueFr};
+            denom_c = 0;
+            for iUniqueEng=1:numel(uniqueEng)
+                currUniqueEng = uniqueEng{iUniqueEng};
+                % denom-c += P(f|e) * F.count(f)
+                denom_c = denom_c + (t.(currUniqueEng).(currUniqueFr) * length(find(strcmp(currFrSent,currUniqueFr))));
+            end
+            for iUniqueEng=1:numel(uniqueEng)
+                currUniqueEng = uniqueEng{iUniqueEng};
+                
+                % Update tcount(f,e)
+                if ~isfield(FECount, currUniqueFr)
+                    FECount.(currUniqueFr) = struct();
+                end
+                if ~isfield(FECount.(currUniqueFr), currUniqueEng)
+                    FECount.(currUniqueFr).(currUniqueEng) = 0;
+                end
+                countf = length(find(strcmp(currFrSent,currUniqueFr)));
+                counte = length(find(strcmp(currEngSent,currUniqueEng)));
+                ProbFE = t.(currUniqueEng).(currUniqueFr);
+                FECount.(currUniqueFr).(currUniqueEng) = FECount.(currUniqueFr).(currUniqueEng) + (ProbFE * countf * counte / denom_c);
+                
+                % Update tcount(e)
+                if ~isfield(ECount, currUniqueEng)
+                    ECount.(currUniqueEng) = 0;
+                end
+                ECount.(currUniqueEng) = ECount.(currUniqueEng) + (ProbFE * countf * counte / denom_c);
+            end
+        end
+    end
+    
+    fnE = fieldnames(ECount);
+    for iCountE=1:numel(fnE);  
+        fnFE = fieldnames(FECount); 
+        fnFECount = numel(fieldnames(fnFE));
+        for iCountFE=1:fnFECount
+            currE = fnE{iCountE};
+            currF = fnFE{iCountFE};
+            t.(currE).(currF) = FECount.(currF).(currE) / ECount.(currE);
+        end
+    end
 
 end
 
