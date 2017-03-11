@@ -101,8 +101,8 @@ function [eng, fr] = read_hansard(mydir, numSentences)
     end
   end
   
-  save('words_eng.mat', '-struct', 'eng');
-  save('words_fr', '-struct', 'fr');
+  save(strcat('words_eng-', num2str(numSentences), '.mat'), 'eng');
+  save(strcat('words_fr-', num2str(numSentences), '.mat'), 'fr');
   
 end
 
@@ -141,7 +141,7 @@ function AM = initialize(eng, fr)
         end
     end
     
-    save('AM_struct.mat', '-struct', 'AM');
+    save('AM_struct.mat', 'AM');
 
 end
 
