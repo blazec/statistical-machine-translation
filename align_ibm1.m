@@ -37,7 +37,7 @@ function AM = align_ibm1(trainDir, numSentences, maxIter, fn_AM)
   [eng, fr] = read_hansard(trainDir, numSentences);
 
   % Initialize AM uniformly 
-  AM = initialize(eng, fr);
+  AM = initialize(eng, fr, numSentences);
 % 
 %   % Iterate between E and M steps
 %   for iter=1:maxIter,
@@ -148,7 +148,6 @@ function AM = initialize(eng, fr, numSentences)
     AM.SENTEND = struct();
     AM.SENTSTART.SENTSTART = 1;
     AM.SENTEND.SENTEND = 1;
-    
     save(strcat('AM_struct-', num2str(numSentences), '.mat'), 'AM');
 
 end
