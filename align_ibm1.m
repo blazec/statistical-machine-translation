@@ -36,8 +36,8 @@ function AM = align_ibm1(trainDir, numSentences, maxIter, fn_AM)
   % Read in the training data
   [eng, fr] = read_hansard(trainDir, numSentences);
 
-%   % Initialize AM uniformly 
-%   AM = initialize(eng, fre);
+  % Initialize AM uniformly 
+  AM = initialize(eng, fr);
 % 
 %   % Iterate between E and M steps
 %   for iter=1:maxIter,
@@ -75,7 +75,6 @@ function [eng, fr] = read_hansard(mydir, numSentences)
   eng = {};
   fr = {};
 
-  % Populate english cell-array
   DE = dir( [ mydir, filesep, '*', 'e'] );
   DF = dir( [ mydir, filesep, '*', 'e'] );
  
@@ -102,17 +101,47 @@ function [eng, fr] = read_hansard(mydir, numSentences)
     end
   end
   
+  save('words_eng.mat', '-struct', 'eng');
+  save('words_fr', '-struct', 'fr');
+  
 end
 
 
-function AM = initialize(eng, fre)
+function AM = initialize(eng, fr)
 %
 % Initialize alignment model uniformly.
 % Only set non-zero probabilities where word pairs appear in corresponding sentences.
 %
-    AM = {}; % AM.(english_word).(foreign_word)
-
-    % TODO: your code goes here
+    AM = struct(); % AM.(english_word).(foreign_word)
+    
+    for iSent=1:numel(eng)
+       sentEng = eng{iSent};
+       sentFr = fr{iSent};
+       for iWordEng=1:numel(sentEng)
+           word = sentEng{iWordEng};
+           if ~isfield(AM, word)
+               AM.(word) = struct();
+           end
+           for iWordFr=1:numel(sentFr)
+              wordFr = sentFr(iWordFr);
+              wordFr = wordFr{1}
+              AM.(word).(wordFr) = 0;
+           end
+       end
+    end
+    fnEng = fieldnames(AM);
+    for iFieldEng=1:length(fnEng)
+        wordEng = fnEng(iFieldEng);
+        wordEng = wordEng{1};
+        fnFr = fieldnames(AM.(wordEng));
+        for iFieldFr=1:length(fnFr)
+            wordFr = fnFr(iFieldFr);
+            wordFr = wordFr{1};
+            AM.(wordEng).(wordFr) = 1 / (length(fnFr));
+        end
+    end
+    
+    save('AM_struct.mat', '-struct', 'AM');
 
 end
 
@@ -121,7 +150,7 @@ function t = em_step(t, eng, fre)
 % One step in the EM algorithm.
 %
   
-  % TODO: your code goes here
+
 end
 
 
