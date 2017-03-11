@@ -36,12 +36,12 @@ function AM = align_ibm1(trainDir, numSentences, maxIter, fn_AM)
   % Read in the training data
   [eng, fr] = read_hansard(trainDir, numSentences);
 
-  % Initialize AM uniformly 
+  %Initialize AM uniformly 
   AM = initialize(eng, fr, numSentences);
-% 
+
   % Iterate between E and M steps
   for iter=1:maxIter,
-    AM = em_step(AM, eng, fre);
+    AM = em_step(AM, eng, fr);
   end
 
   % Save the alignment model
@@ -76,7 +76,7 @@ function [eng, fr] = read_hansard(mydir, numSentences)
   fr = {};
 
   DE = dir( [ mydir, filesep, '*', 'e'] );
-  DF = dir( [ mydir, filesep, '*', 'e'] );
+  DF = dir( [ mydir, filesep, '*', 'f'] );
  
   num_files = min(length(DE), length(DF));
   limitReached = 0;
@@ -156,26 +156,35 @@ function t = em_step(t, eng, fr)
 % 
 % One step in the EM algorithm.
 %
+    t.SENTEND
     FECount = struct();
     ECount = struct();
     
     for iEngSent = 1:numel(eng)
-        currEngSent = eng{iSent};
-        currFrSent = fr{iSent};
+        currEngSent = eng{iEngSent};
+        currFrSent = fr{iEngSent};
         uniqueEng = unique(currEngSent);
         uniqueFr = unique(currFrSent);
         
         for iUniqueFr=1:numel(uniqueFr)
             currUniqueFr = uniqueFr{iUniqueFr};
+            if strcmp(currUniqueFr, 'SENTSTART') || strcmp(currUniqueFr, 'SENTEND')
+                continue
+            end
             denom_c = 0;
             for iUniqueEng=1:numel(uniqueEng)
                 currUniqueEng = uniqueEng{iUniqueEng};
+                if strcmp(currUniqueEng, 'SENTSTART') || strcmp(currUniqueEng, 'SENTEND')
+                    continue
+                end
                 % denom-c += P(f|e) * F.count(f)
                 denom_c = denom_c + (t.(currUniqueEng).(currUniqueFr) * length(find(strcmp(currFrSent,currUniqueFr))));
             end
             for iUniqueEng=1:numel(uniqueEng)
                 currUniqueEng = uniqueEng{iUniqueEng};
-                
+                if strcmp(currUniqueEng, 'SENTSTART') || strcmp(currUniqueEng, 'SENTEND')
+                    continue
+                end
                 % Update tcount(f,e)
                 if ~isfield(FECount, currUniqueFr)
                     FECount.(currUniqueFr) = struct();
@@ -195,16 +204,21 @@ function t = em_step(t, eng, fr)
                 ECount.(currUniqueEng) = ECount.(currUniqueEng) + (ProbFE * countf * counte / denom_c);
             end
         end
+        
     end
     
     fnE = fieldnames(ECount);
     for iCountE=1:numel(fnE);  
         fnFE = fieldnames(FECount); 
-        fnFECount = numel(fieldnames(fnFE));
+        fnFECount = numel(fnFE);
         for iCountFE=1:fnFECount
             currE = fnE{iCountE};
             currF = fnFE{iCountFE};
-            t.(currE).(currF) = FECount.(currF).(currE) / ECount.(currE);
+            if ~isfield(FECount.(currF), currE)
+                t.(currE).(currF) = 0;
+            else
+                t.(currE).(currF) = FECount.(currF).(currE) / ECount.(currE);
+            end
         end
     end
 
