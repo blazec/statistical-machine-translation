@@ -1,0 +1,14 @@
+Delta smoothing
+delta E.perplexity F.perplexity
+0.001 38.8370 35.5754
+0.01 40.8533 39.51
+0.05 50.0757 50.9041
+0.1 57.9096 60.2416
+0.5 94.5012 104.3251
+
+MLE
+E.perplexity F.perplexity
+15.6233 15.6421
+
+
+For delta smoothing, as the delta increases from a certain threshold, perplexity increases. I picked 0.001 as my lowest delta. However, at a certain threshold, as the delta decreases, the perplexity increases (e.g. I tried delta=0.00001 and delta=0.000000001 and E.perplexity is 48.5473 and 69.988, respectively). MLE perplexity is lower than perplexities at delta=0.001, hence there is no apparent advantage for delta smoothing at the given deltas (more experimentation on deltas needed).

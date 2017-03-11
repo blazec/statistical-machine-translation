@@ -40,7 +40,7 @@ function AM = align_ibm1(trainDir, numSentences, maxIter, fn_AM)
   AM = initialize(eng, fr, numSentences);
 
   % Iterate between E and M steps
-  for iter=1:maxIter,
+  for iter=1:maxIter
     AM = em_step(AM, eng, fr);
   end
 
@@ -156,7 +156,6 @@ function t = em_step(t, eng, fr)
 % 
 % One step in the EM algorithm.
 %
-    t.SENTEND
     FECount = struct();
     ECount = struct();
     
@@ -214,9 +213,7 @@ function t = em_step(t, eng, fr)
         for iCountFE=1:fnFECount
             currE = fnE{iCountE};
             currF = fnFE{iCountFE};
-            if ~isfield(FECount.(currF), currE)
-                t.(currE).(currF) = 0;
-            else
+            if isfield(FECount.(currF), currE)
                 t.(currE).(currF) = FECount.(currF).(currE) / ECount.(currE);
             end
         end
