@@ -113,20 +113,23 @@ function AM = initialize(eng, fr)
 % Only set non-zero probabilities where word pairs appear in corresponding sentences.
 %
     AM = struct(); % AM.(english_word).(foreign_word)
-    
     for iSent=1:numel(eng)
        sentEng = eng{iSent};
        sentFr = fr{iSent};
        for iWordEng=1:numel(sentEng)
            word = sentEng{iWordEng};
-           if ~isfield(AM, word)
-               AM.(word) = struct();
-           end
-           for iWordFr=1:numel(sentFr)
-              wordFr = sentFr(iWordFr);
-              wordFr = wordFr{1}
-              AM.(word).(wordFr) = 0;
-           end
+           if ~strcmp(word, 'SENTSTART') && ~strcmp(word, 'SENTEND')
+               if ~isfield(AM, word)
+                  AM.(word) = struct();
+               end
+               for iWordFr=1:numel(sentFr)
+                  wordFr = sentFr(iWordFr);
+                  wordFr = wordFr{1}
+                  if ~strcmp(wordFr, 'SENTSTART') && ~strcmp(wordFr, 'SENTEND')
+                      AM.(word).(wordFr) = 0;
+                  end
+               end
+           end 
        end
     end
     fnEng = fieldnames(AM);
@@ -140,6 +143,11 @@ function AM = initialize(eng, fr)
             AM.(wordEng).(wordFr) = 1 / (length(fnFr));
         end
     end
+    
+    AM.SENTSTART = struct();
+    AM.SENTEND = struct();
+    AM.SENTSTART.SENTSTART = 1;
+    AM.SENTEND.SENTEND = 1;
     
     save('AM_struct.mat', 'AM');
 
