@@ -34,18 +34,18 @@ function AM = align_ibm1(trainDir, numSentences, maxIter, fn_AM)
   AM = struct();
   
   % Read in the training data
-  [eng, fre] = read_hansard(trainDir, numSentences);
+  [eng, fr] = read_hansard(trainDir, numSentences);
 
-  % Initialize AM uniformly 
-  AM = initialize(eng, fre);
-
-  % Iterate between E and M steps
-  for iter=1:maxIter,
-    AM = em_step(AM, eng, fre);
-  end
-
-  % Save the alignment model
-  save( fn_AM, 'AM', '-mat'); 
+%   % Initialize AM uniformly 
+%   AM = initialize(eng, fre);
+% 
+%   % Iterate between E and M steps
+%   for iter=1:maxIter,
+%     AM = em_step(AM, eng, fre);
+%   end
+% 
+%   % Save the alignment model
+%   save( fn_AM, 'AM', '-mat'); 
 
   end
 
@@ -59,7 +59,7 @@ function AM = align_ibm1(trainDir, numSentences, maxIter, fn_AM)
 %
 % --------------------------------------------------------------------------------
 
-function [eng, fre] = read_hansard(mydir, numSentences)
+function [eng, fr] = read_hansard(mydir, numSentences)
 %
 % Read 'numSentences' parallel sentences from texts in the 'dir' directory.
 %
@@ -72,11 +72,36 @@ function [eng, fre] = read_hansard(mydir, numSentences)
 %
 %         eng{i} = strsplit(' ', preprocess(english_sentence, 'e'));
 %
-  %eng = {};
-  %fre = {};
+  eng = {};
+  fr = {};
 
-  % TODO: your code goes here.
-
+  % Populate english cell-array
+  DE = dir( [ mydir, filesep, '*', 'e'] );
+  DF = dir( [ mydir, filesep, '*', 'e'] );
+ 
+  num_files = min(length(DE), length(DF));
+  limitReached = 0;
+  
+  for iFile = 1:num_files
+    linesEng = textread([mydir, filesep, DE(iFile).name], '%s','delimiter','\n');
+    linesFr = textread([mydir, filesep, DF(iFile).name], '%s','delimiter','\n');
+    for l=1:length(linesEng)
+        processedLineEng =  preprocess(linesEng{l}, 'e');
+        processedLineFr = preprocess(linesFr{l}, 'f');
+        wordsEng = strsplit(' ', processedLineEng);
+        wordsFr = strsplit(' ', processedLineFr);
+        eng{l} = wordsEng;
+        fr{l} = wordsFr;
+        if length(eng) == numSentences
+            limitReached = 1;
+            break
+        end
+    end
+    if limitReached
+        break
+    end
+  end
+  
 end
 
 
